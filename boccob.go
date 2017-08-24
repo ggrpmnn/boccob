@@ -77,6 +77,7 @@ func Audit(hc *http.Client, urlStr string, pages map[string]Page) {
 		log.Printf("error response body '%s' is nil", urlStr)
 		return
 	}
+	defer res.Body.Close()
 
 	// read page response
 	bodyBytes, err := ioutil.ReadAll(res.Body)
