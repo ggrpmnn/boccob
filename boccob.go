@@ -28,13 +28,15 @@ var (
 
 func main() {
 	// parse command line flags
-	flag.StringVar(&baseURL, "s", "", "the base URL of the site to crawl (include http/https and subdomain)")
+	flag.StringVar(&baseURL, "s", "", "the base URL of the site to crawl (include protocol and subdomain)")
 	flag.Parse()
 
 	// check the command line params
 	if baseURL == "" {
 		flag.Usage()
 		os.Exit(1)
+	} else {
+		baseURL = strings.TrimSuffix(baseURL, "/")
 	}
 
 	// create list and add site index to it
@@ -74,7 +76,7 @@ func Audit(hc *http.Client, urlStr string, pages map[string]Page) {
 		return
 	}
 	if res.Body == nil {
-		log.Printf("error response body '%s' is nil", urlStr)
+		log.Printf("error response body from '%s' is nil", urlStr)
 		return
 	}
 	defer res.Body.Close()
@@ -133,6 +135,7 @@ func ignoreURL(URLStr string) bool {
 	return false
 }
 
+// if a link URL does not include the base URL, compose and return the full address
 func validateAndFormURL(URLStr string) string {
 	if strings.HasPrefix(URLStr, "/") {
 		return baseURL + strings.TrimSuffix(URLStr, "/")
